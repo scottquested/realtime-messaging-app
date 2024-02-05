@@ -11,13 +11,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "convex/react";
-import { Send } from "lucide-react";
+import { Clock, Send } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { api } from "../../convex/_generated/api";
 import { Card } from "@/components/ui/card";
 import { SignedIn, UserButton, useSession } from "@clerk/nextjs";
 import classnames from "classnames";
+import { formatDistance, subDays } from "date-fns";
 
 const formSchema = z.object({
 	message: z.string().trim().min(1),
@@ -44,7 +45,7 @@ export default function Home() {
 		}
 	};
 	return (
-		<main className="flex flex-col p-24 min-h-svh">
+		<main className="flex flex-col p-24 min-h-svh bg-slate-100">
 			<h1 className="text-4xl font-bold text-center mb-24 flex items-center gap-4 justify-center">
 				Realtime Messaging App
 				<SignedIn>
@@ -58,17 +59,22 @@ export default function Home() {
 							return (
 								<div
 									key={message._id}
-									className={classnames(
-										"rounded-lg p-4 mb-4 max-w-64 text-xs",
-										{
-											"bg-green-200 mr-auto":
-												message.userId === session?.user.id,
-											"bg-blue-200 ml-auto":
-												message.userId !== session?.user.id,
-										}
-									)}
+									className={classnames("rounded-lg p-4 mb-4 max-w-64", {
+										"bg-green-200 mr-auto": message.userId === session?.user.id,
+										"bg-blue-200 ml-auto": message.userId !== session?.user.id,
+									})}
 								>
 									{message.message}
+									<span className="flex gap-1 items-center justify-end mt-4 text-xs opacity-50">
+										<Clock className="w-3 h-3" />{" "}
+										{formatDistance(
+											subDays(new Date(message._creationTime), 0),
+											new Date(),
+											{
+												addSuffix: true,
+											}
+										)}
+									</span>
 								</div>
 							);
 						})}
