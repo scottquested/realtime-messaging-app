@@ -16,6 +16,8 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { api } from "../../convex/_generated/api";
 import { Card } from "@/components/ui/card";
+import { SignedIn, UserButton, useSession } from "@clerk/nextjs";
+import classnames from "classnames";
 
 const formSchema = z.object({
 	message: z.string().trim().min(1),
@@ -24,6 +26,7 @@ const formSchema = z.object({
 export default function Home() {
 	const messages = useQuery(api.queries.getMessages);
 	const sendMessage = useMutation(api.mutations.sendMessage);
+	const { session } = useSession();
 
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
@@ -41,12 +44,36 @@ export default function Home() {
 		}
 	};
 	return (
-		<main className="p-24 min-h-svh">
-			<h1 className="text-4xl font-bold text-center mb-24">
+		<main className="flex flex-col p-24 min-h-svh">
+			<h1 className="text-4xl font-bold text-center mb-24 flex items-center gap-4 justify-center">
 				Realtime Messaging App
+				<SignedIn>
+					<UserButton afterSignOutUrl="\" />
+				</SignedIn>
 			</h1>
-			<div className="grid grid-cols-2 h-full gap-10">
-				<Card className="p-10 h-full">
+			<Card className="h-full flex-1 flex flex-col p-8">
+				<ul className="">
+					{messages &&
+						messages.map((message) => {
+							return (
+								<div
+									key={message._id}
+									className={classnames(
+										"rounded-lg p-4 mb-4 max-w-64 text-xs",
+										{
+											"bg-green-200 mr-auto":
+												message.userId === session?.user.id,
+											"bg-blue-200 ml-auto":
+												message.userId !== session?.user.id,
+										}
+									)}
+								>
+									{message.message}
+								</div>
+							);
+						})}
+				</ul>
+				<div className="mt-auto">
 					<Form {...form}>
 						<form
 							onSubmit={form.handleSubmit(onSubmit)}
@@ -59,7 +86,7 @@ export default function Home() {
 									return (
 										<FormItem className="w-full">
 											<FormControl>
-												<Input placeholder="message" {...field} />
+												<Input placeholder="Type your message" {...field} />
 											</FormControl>
 											<FormMessage className="absolute bottom-[-1.5rem] left-0" />
 										</FormItem>
@@ -71,16 +98,8 @@ export default function Home() {
 							</Button>
 						</form>
 					</Form>
-				</Card>
-				<Card className="p-10 h-full">
-					<ul>
-						{messages &&
-							messages.map((message) => {
-								return <div key={message._id}>{message.message}</div>;
-							})}
-					</ul>
-				</Card>
-			</div>
+				</div>
+			</Card>
 		</main>
 	);
 }
