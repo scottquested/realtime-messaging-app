@@ -1,7 +1,26 @@
 {
 	"name": "realtime-messaging-app",
-	"version": "0.1.0",
-	"private": true,
+	"version": "1.0.0",
+	"description": "Realtime messaging app",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/scottquested/realtime-messaging-app.git"
+	},
+	"homepage": "https://github.com/scottquested/realtime-messaging-app#readme",
+	"bugs": {
+		"url": "https://github.com/scottquested/realtime-messaging-app/issues"
+	},
+	"license": "MIT",
+	"keywords": [
+		"React",
+		"Next.js",
+		"typescript",
+		"tailwindcss",
+		"ShadCN",
+		"Convex",
+		"Clerk"
+	],
+	"author": "Scott Quested",
 	"scripts": {
 		"dev": "next dev",
 		"build": "next build",
